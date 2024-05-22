@@ -25,8 +25,8 @@ const Contact = () => {
 		setCurrentAnimation("hit");
 		emailjs
 			.send(
-				process.env.VITE_APP_EMAILJS_SERVICE_ID,
-				process.env.VITE_APP_EMAILJS_TEMPLATE_ID,
+				import.meta.env.VITE_APP_EMAILJS_SERVICE_ID,
+				import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID,
 				{
 					from_name: form.name,
 					to_name: "Yash",
@@ -34,7 +34,7 @@ const Contact = () => {
 					to_email: "injose.joshi@gmail.com",
 					message: form.message,
 				},
-				process.env.VITE_APP_EMAILJS_PUBLIC_KEY
+				import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY
 			)
 			.then(() => {
 				setIsLoading(false);
