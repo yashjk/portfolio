@@ -124,13 +124,13 @@ export const experiences = [
 		iconBg: "#fbc3bc",
 		date: "December 2022 - Present",
 		points: [
-			"Contributed to the development and maintenance of the full-stack learning platform bigbinaryacademy.com."
-			"Designed and developed courses and exercises to enhance student learning experiences."
-			"Built and launched new projects aimed at improving student engagement and learning outcomes."
-			"Collaborated with cross-functional teams to ensure seamless integration of new features and tools."
-			"Conducted user research and feedback sessions to continuously improve course content and platform usability."
-			"Implemented responsive design principles to ensure a consistent experience across devices."
-			"Utilized analytics to track student progress and optimize learning pathways."
+			"Contributed to the development and maintenance of the full-stack learning platform bigbinaryacademy.com.",
+			"Designed and developed courses and exercises to enhance student learning experiences.",
+			"Built and launched new projects aimed at improving student engagement and learning outcomes.",
+			"Collaborated with cross-functional teams to ensure seamless integration of new features and tools.",
+			"Conducted user research and feedback sessions to continuously improve course content and platform usability.",
+			"Implemented responsive design principles to ensure a consistent experience across devices.",
+			"Utilized analytics to track student progress and optimize learning pathways.",
 		],
 	}
 ];
