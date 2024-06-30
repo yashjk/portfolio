@@ -184,7 +184,7 @@ export const projects = [
 		name: "Full Stack Instagram Clone",
 		description:
 			"Built a complete clone of Instagram, allowing users to share photos and connect with friends in a familiar social media environment.",
-		link: "https://github.com/yashjk/insta_clone",
+		link: "https://github.com/yashjk/SocialSphere",
 	},
 	{
 		iconUrl: estate,
