@@ -21,7 +21,7 @@ import estate from './estate.svg'
 import pricewise from './pricewise.svg'
 import snapgram from './snapgram.svg'
 import summiz from './summiz.svg'
-import threads from './threads.svg'
+import apple from './apple.svg'
 import arrow from './arrow.svg'
 import contact from './contact.svg'
 import soundon from './soundon.png'
@@ -51,7 +51,7 @@ export {
     pricewise,
     snapgram,
     summiz,
-    threads,
+    apple,
     arrow,
     contact,
     soundon,

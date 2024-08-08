@@ -21,7 +21,7 @@ import {
 	snapgram,
 	summiz,
 	tailwindcss,
-	threads,
+	apple,
 	typescript,
 } from "../assets/icons";
 
@@ -111,10 +111,11 @@ export const experiences = [
 		iconBg: "#accbe1",
 		date: "November 2020 - December 2022",
 		points: [
-			"Developing and maintaining web applications using React.js and other related technologies.",
-			"Collaborating with cross-functional teams including designers, product managers, and other developers to create high-quality products.",
-			"Implementing responsive design and ensuring cross-browser compatibility.",
-			"Participating in code reviews and providing constructive feedback to other developers.",
+			"Implemented complex data visualization features, enhancing data accuracy by 30%.",
+      "Integrated third-party APIs for real-time data syncing, increasing data processing speed by 50%.",
+      "Ensured compliance with healthcare regulations, reducing compliance issues by 25%.",
+      "Conducted performance optimization for large datasets.",
+      "Participated in code reviews, reducing code errors by 20%."
 		],
 	},
 	{
@@ -122,15 +123,13 @@ export const experiences = [
 		company_name: "BigBinary Academy",
 		icon: bba,
 		iconBg: "#fbc3bc",
-		date: "December 2022 - Present",
+		date: "December 2022 - June 2024",
 		points: [
-			"Contributed to the development and maintenance of the full-stack learning platform bigbinaryacademy.com.",
-			"Designed and developed courses and exercises to enhance student learning experiences.",
-			"Built and launched new projects aimed at improving student engagement and learning outcomes.",
-			"Collaborated with cross-functional teams to ensure seamless integration of new features and tools.",
-			"Conducted user research and feedback sessions to continuously improve course content and platform usability.",
-			"Implemented responsive design principles to ensure a consistent experience across devices.",
-			"Utilized analytics to track student progress and optimize learning pathways.",
+      "Contributed to the development of the full-stack learning platform https://bigbinaryacademy.com/ -Designed courses, improving student performance by 30%.",
+      "Launched new projects, increasing engagement by 35%.",
+      "Integrated new features, reducing implementation time by 25%.",
+      "Conducted user research to enhance platform usability.",
+      "Tracked student progress using analytics to optimize learning pathways."
 		],
 	}
 ];
@@ -157,49 +156,28 @@ export const projects = [
 	{
 		iconUrl: pricewise,
 		theme: "btn-back-red",
-		name: "Banking App",
+		name: "BankEase",
 		description:
-			"Developed a web application that tracks and notifies users of price changes for products on Amazon, helping users find the best deals.",
-		link: "https://github.com/adrianhajdin/pricewise",
+			"Comprehensive banking application using TypeScript, Next.js, Chart.js, TailwindCSS, shadcn/ui, Appwrite, Plaid, and Dwolla.",
+		source_code: "https://github.com/yashjk/bank-ease",
+		live_link: "https://bank-ease.vercel.app/",
 	},
 	{
-		iconUrl: threads,
+		iconUrl: apple,
 		theme: "btn-back-green",
-		name: "Full Stack Threads Clone",
+		name: "Apple website clone",
 		description:
-			'Created a full-stack replica of the popular discussion platform "Threads," enabling users to post and engage in threaded conversations.',
-		link: "https://github.com/adrianhajdin/threads",
-	},
-	{
-		iconUrl: car,
-		theme: "btn-back-blue",
-		name: "Car Finding App",
-		description:
-			"Designed and built a mobile app for finding and comparing cars on the market, streamlining the car-buying process.",
-		link: "https://github.com/adrianhajdin/project_next13_car_showcase",
+			"Developed with React, GSAP, Three.js, and Tailwind CSS, featuring dynamic animations and 3D models.",
+		source_code: "https://github.com/yashjk/apple_website",
+		live_link: "https://apple-website-gray.vercel.app/",
 	},
 	{
 		iconUrl: snapgram,
 		theme: "btn-back-pink",
-		name: "Full Stack Instagram Clone",
+		name: "SocialSphere",
 		description:
-			"Built a complete clone of Instagram, allowing users to share photos and connect with friends in a familiar social media environment.",
-		link: "https://github.com/yashjk/SocialSphere",
-	},
-	{
-		iconUrl: estate,
-		theme: "btn-back-black",
-		name: "Real-Estate Application",
-		description:
-			"Developed a web application for real estate listings, facilitating property searches and connecting buyers with sellers.",
-		link: "https://github.com/adrianhajdin/projects_realestate",
-	},
-	{
-		iconUrl: summiz,
-		theme: "btn-back-yellow",
-		name: "AI Summarizer Application",
-		description:
-			"App that leverages AI to automatically generate concise & informative summaries from lengthy text content, or blogs.",
-		link: "https://github.com/adrianhajdin/project_ai_summarizer",
-	},
+			"Social networking platform with dynamic user profiles and rich media posts, built using React, GSAP, Tailwind CSS, React Hook Form, and SolidJS Dropzone.",
+		source_code: "https://github.com/yashjk/SocialSphere",
+		live_link: "https://social-sphere-lime.vercel.app/",
+	}
 ];
