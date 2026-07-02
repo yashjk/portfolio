@@ -30,7 +30,7 @@ const Projects = () => {
 							<div className="btn-front rounded-xl flex justify-center items-center">
 								<img
 									src={project.iconUrl}
-									alt="threads"
+									alt={`${project.name} logo`}
 									className="w-1/2 h-1/2 object-contain"
 								/>
 							</div>
@@ -42,14 +42,16 @@ const Projects = () => {
 							</h4>
 							<p className="mt-2 text-slate-500">{project.description}</p>
 							<div className="mt-5 flex items-center gap-2 font-poppins">
-								<Link
-									to={project.source_code}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="font-semibold text-blue-600"
-								>
-									Source Code
-								</Link>
+								{project.source_code && (
+									<Link
+										to={project.source_code}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="font-semibold text-blue-600"
+									>
+										Source Code
+									</Link>
+								)}
 								<Link
 									to={project.live_link}
 									target="_blank"

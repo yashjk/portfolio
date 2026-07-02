@@ -17,10 +17,12 @@ const About = () => {
 				</span>
 			</h1>
 
-			<div className="">
+			<div className="mt-5 flex flex-col gap-3 text-slate-500">
 				<p>
-					Software Engineer based in India with expertise in Next.js, React.js,
-					MongoDB, Express and Ruby on Rails.
+					Frontend-focused full-stack engineer based in India with 5+ years across
+					React, Next.js, and TypeScript. I build performant, accessible UIs and
+					scalable frontend architecture — from a fintech platform I built from
+					scratch to AI-evaluation benchmarks that challenge frontier LLMs.
 				</p>
 			</div>
 
@@ -54,7 +56,7 @@ const About = () => {
 
 				<div className="mt-12 flex">
 					<VerticalTimeline>
-						{experiences.map((experience, index) => (
+						{[...experiences].reverse().map((experience, index) => (
 							<VerticalTimelineElement
 								className="mt-12"
 								key={experience.company_name}
@@ -72,7 +74,7 @@ const About = () => {
 								contentStyle={{
 									borderBottom: "8px",
 									borderStyle: "solid",
-									borderBottomColor: experience.iconBg,
+									borderBottomColor: experience.borderColor || experience.iconBg,
 									boxShadow: "none",
 								}}
 							>

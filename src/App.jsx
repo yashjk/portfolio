@@ -8,7 +8,7 @@ import Projects from "./pages/Projects";
 
 const App = () => {
 	return (
-		<main className="bg-slate-300/20 h-[100vh]">
+		<main className="bg-slate-300/20 min-h-screen">
 			<Router>
 				<Navbar />
 				<Routes>
