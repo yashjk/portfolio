@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150">
+  <defs>
+    <linearGradient id="thetaBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="55%" stop-color="#f2f6fb"/>
+      <stop offset="100%" stop-color="#d6e4f2"/>
+    </linearGradient>
+  </defs>
+  <rect width="150" height="150" rx="10" fill="url(#thetaBg)"/>
+  <text x="75" y="82" text-anchor="middle" dominant-baseline="central"
+        font-family="Georgia, 'Times New Roman', serif" font-style="italic"
+        font-weight="700" font-size="118" fill="#050505">&#952;</text>
+</svg>

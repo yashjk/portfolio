@@ -1,4 +1,4 @@
-import { meta, shopify, vineti, bba } from "../assets/images";
+import { meta, shopify, vineti, bba, automint, theta, agastya } from "../assets/images";
 import {
 	car,
 	contact,
@@ -131,6 +131,36 @@ export const experiences = [
       "Conducted user research to enhance platform usability.",
       "Tracked student progress using analytics to optimize learning pathways."
 		],
+	},
+	{
+		title: "Senior Frontend Engineer",
+		company_name: "Automint",
+		icon: automint,
+		iconBg: "#ffffff",
+		borderColor: "#b7e4c7",
+		date: "January 2025 - December 2025",
+		points: [
+			"Sole frontend engineer — built the entire platform from scratch in Next.js, React 19, and TypeScript for a device-leasing (Device-as-a-Service) fintech product.",
+			"Architected a Zustand slice-pattern state layer and a reusable library of 50+ components that served as an internal design system.",
+			"Built a multi-step Razorpay payment workflow as a state machine, an eligibility-rules engine, and OTP/JWT authentication.",
+			"Cut initial load time ~40% via SSR, code-splitting, and custom list virtualization for heavy data grids.",
+			"Implemented end-to-end observability (OpenTelemetry + Grafana Faro), CI/CD (GitHub Actions), and ~90% E2E coverage with Playwright.",
+		],
+	},
+	{
+		title: "Software Engineer — AI Evaluation & Frontend",
+		company_name: "Theta Software",
+		icon: theta,
+		iconBg: "#ffffff",
+		borderColor: "#a2d2ff",
+		date: "December 2025 - June 2026",
+		points: [
+			"Authored verifiable software-engineering benchmark tasks on the Harbor eval framework that defeated frontier models (Opus 4.7/4.8, GPT-5.5).",
+			"Built contamination-proof single-container Docker environments with Fail-to-Pass / Pass-to-Pass Playwright tests and an LLM rubric judge.",
+			"Built a Dynamics-365 CRM clone in Next.js + TypeScript with a Recharts visualization suite and Zustand state.",
+			"Engineered an Advanced Report engine (~82 SQL filter builders), billing, and provider-settings modules for a healthcare EMR.",
+			"Root-caused a data-integrity bug that had been inflating benchmark scores.",
+		],
 	}
 ];
 
@@ -153,6 +183,14 @@ export const socialLinks = [
 ];
 
 export const projects = [
+	{
+		iconUrl: agastya,
+		theme: "btn-back-blue",
+		name: "Agastya Pharma",
+		description:
+			"Live client website for a pharmaceutical consultancy, built with Next.js (App Router), React, TypeScript, Tailwind CSS, and shadcn/ui — a multi-page marketing site with services, turnkey solutions, industries, a blog with dynamic routes, and a contact form.",
+		live_link: "https://www.agastyapharma.com/",
+	},
 	{
 		iconUrl: pricewise,
 		theme: "btn-back-red",
