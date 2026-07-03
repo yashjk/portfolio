@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import itachi from "../assets/itachi.mp3";
-import { soundoff, soundon } from "../assets/icons";
 
 // Global background-music control. Rendered once in App so the track persists
 // across route changes instead of restarting. Implemented as a real <button>
@@ -33,14 +32,31 @@ const MusicToggle = () => {
 			onClick={() => setIsPlaying((p) => !p)}
 			aria-pressed={isPlaying}
 			aria-label={isPlaying ? "Turn background music off" : "Turn background music on"}
-			className="fixed bottom-4 right-4 z-20 rounded-full bg-blue-500 p-1 transition hover:bg-blue-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050813]"
+			className="fixed bottom-4 right-4 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg transition hover:bg-blue-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050813]"
 		>
-			<img
-				src={isPlaying ? soundon : soundoff}
-				alt=""
+			<svg
+				viewBox="0 0 24 24"
+				className="h-5 w-5"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth={2}
+				strokeLinecap="round"
+				strokeLinejoin="round"
 				aria-hidden="true"
-				className="w-10 h-10 object-contain"
-			/>
+			>
+				<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none" />
+				{isPlaying ? (
+					<>
+						<path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+						<path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+					</>
+				) : (
+					<>
+						<line x1="23" y1="9" x2="17" y2="15" />
+						<line x1="17" y1="9" x2="23" y2="15" />
+					</>
+				)}
+			</svg>
 		</button>
 	);
 };
