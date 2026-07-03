@@ -5,6 +5,8 @@ import RocketModel from "./RocketModel";
 import SatelliteModel from "./SatelliteModel";
 import earthDayUrl from "../assets/textures/earth-day.jpg";
 import earthSpecUrl from "../assets/textures/earth-specular.jpg";
+import earthNightUrl from "../assets/textures/earth-lights.png";
+import earthCloudsUrl from "../assets/textures/earth-clouds.png";
 
 // Giant Earth anchored far in the bottom-left; only a large curved limb shows.
 // A rocket launches (curving outward so it never enters Earth), transforms
@@ -21,9 +23,13 @@ const FAST_SPEED = 0.9; // rad/s while it's hidden on the far side (returns soon
 const VIS_HALF = 1.1; // half-width (rad) of the visible arc around the limb
 const SMOKE = 60;
 const _up = new THREE.Vector3(0, 1, 0);
+// Direction toward the key light — used to mask the night-lights emissive to
+// the dark hemisphere. Must match the <directionalLight> position in App.
+const SUN_DIR = new THREE.Vector3(-3, 3, 12).normalize();
 
 const OrbitScene = () => {
 	const earth = useRef();
+	const clouds = useRef();
 	const rocket = useRef();
 	const satellite = useRef();
 	const flame = useRef();
@@ -36,15 +42,21 @@ const OrbitScene = () => {
 	const head = useRef(0);
 	const orbAngle = useRef(0);
 
-	// Real NASA Blue Marble day map + ocean specular map. Loaded imperatively
-	// (no Suspense needed) — the material updates once the images arrive.
-	const [earthMap, earthSpec] = useMemo(() => {
+	// Real NASA Blue Marble maps: day, ocean specular, night city lights, and
+	// clouds. Loaded imperatively (no Suspense) — materials update on arrival.
+	const [earthMap, earthSpec, nightMap, cloudsMap] = useMemo(() => {
 		const loader = new THREE.TextureLoader();
 		const day = loader.load(earthDayUrl);
 		day.colorSpace = THREE.SRGBColorSpace;
 		day.anisotropy = 8;
 		const spec = loader.load(earthSpecUrl); // data map — keep linear
-		return [day, spec];
+		const night = loader.load(earthNightUrl);
+		night.colorSpace = THREE.SRGBColorSpace;
+		night.anisotropy = 8;
+		const clouds = loader.load(earthCloudsUrl);
+		clouds.colorSpace = THREE.SRGBColorSpace;
+		clouds.anisotropy = 8;
+		return [day, spec, night, clouds];
 	}, []);
 
 	const starGeom = useMemo(() => {
@@ -96,6 +108,7 @@ const OrbitScene = () => {
 	useFrame((state, delta) => {
 		const t = state.clock.getElapsedTime();
 		if (earth.current) earth.current.rotation.y += delta * 0.06;
+		if (clouds.current) clouds.current.rotation.y += delta * 0.09; // drift faster than the surface
 		if (stars.current) stars.current.rotation.y -= delta * 0.005;
 		const launching = t < LAUNCH_DUR;
 
@@ -209,8 +222,35 @@ const OrbitScene = () => {
 					metalness={0.2}
 					roughness={0.6}
 					emissive="#ffffff"
-					emissiveMap={earthMap}
-					emissiveIntensity={0.22}
+					emissiveMap={nightMap}
+					emissiveIntensity={2.2}
+					onBeforeCompile={(shader) => {
+						shader.uniforms.uSunDirection = { value: SUN_DIR };
+						shader.fragmentShader = shader.fragmentShader
+							.replace(
+								"#include <common>",
+								"#include <common>\nuniform vec3 uSunDirection;"
+							)
+							.replace(
+								"#include <emissivemap_fragment>",
+								`#include <emissivemap_fragment>
+								// City lights only on the night side of the terminator.
+								vec3 sunView = normalize((viewMatrix * vec4(uSunDirection, 0.0)).xyz);
+								float dayFactor = smoothstep(-0.15, 0.25, dot(normalize(vNormal), sunView));
+								totalEmissiveRadiance *= (1.0 - dayFactor);`
+							);
+					}}
+				/>
+			</mesh>
+
+			{/* clouds — a slightly larger sphere drifting over the surface */}
+			<mesh ref={clouds} position={EARTH_C}>
+				<sphereGeometry args={[EARTH_R + 0.22, 96, 96]} />
+				<meshStandardMaterial
+					map={cloudsMap}
+					transparent
+					opacity={0.85}
+					depthWrite={false}
 				/>
 			</mesh>
 

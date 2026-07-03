@@ -21,8 +21,8 @@ const App = () => {
 					tabIndex={-1}
 				>
 					<color attach="background" args={["#050813"]} />
-					<ambientLight intensity={0.6} />
-					<directionalLight position={[-3, 3, 12]} intensity={2.6} />
+					<ambientLight intensity={0.35} />
+					<directionalLight position={[-3, 3, 12]} intensity={2.7} />
 					<OrbitScene />
 				</Canvas>
 				{/* scrim — darkens toward the right where content sits, for contrast */}
