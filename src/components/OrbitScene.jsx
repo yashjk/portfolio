@@ -26,14 +26,20 @@ const _up = new THREE.Vector3(0, 1, 0);
 // Direction toward the key light — used to mask the night-lights emissive to
 // the dark hemisphere. Must match the <directionalLight> position in App.
 const SUN_DIR = new THREE.Vector3(-2, 4, 7).normalize();
+const SUN_SPEED = 0.12; // rad/s — sun orbits the globe (~52s day/night cycle)
+const SUN_TILT = 0.32; // keeps the sun a little "north" of edge-on
 
 const OrbitScene = () => {
 	const earth = useRef();
 	const clouds = useRef();
+	const sun = useRef(); // the moving directional light
 	const rocket = useRef();
 	const satellite = useRef();
 	const flame = useRef();
 	const stars = useRef();
+	// Shared uniform: the earth material's shader reads the same object we
+	// update each frame, so the city-lights mask tracks the moving sun.
+	const sunUniform = useRef({ value: SUN_DIR.clone() });
 	const puffRefs = useRef([]);
 	const puffState = useRef(
 		Array.from({ length: SMOKE }, () => ({ life: 0, pos: new THREE.Vector3() }))
@@ -110,6 +116,13 @@ const OrbitScene = () => {
 		if (earth.current) earth.current.rotation.y += delta * 0.06;
 		if (clouds.current) clouds.current.rotation.y += delta * 0.09; // drift faster than the surface
 		if (stars.current) stars.current.rotation.y -= delta * 0.005;
+
+		// Orbit the sun so the terminator sweeps across the globe over time,
+		// cycling day -> dusk -> night -> dawn. The shader mask reads the same
+		// uniform, so the city lights follow the moving night side.
+		const sa = t * SUN_SPEED;
+		sunUniform.current.value.set(Math.cos(sa), SUN_TILT, Math.sin(sa)).normalize();
+		if (sun.current) sun.current.position.copy(sunUniform.current.value).multiplyScalar(20);
 		const launching = t < LAUNCH_DUR;
 
 		// rocket: fly the Bézier during launch, then shrink out over the transition
@@ -186,6 +199,9 @@ const OrbitScene = () => {
 
 	return (
 		<>
+			{/* moving sun (animated in useFrame so the terminator sweeps) */}
+			<directionalLight ref={sun} intensity={3.2} />
+
 			<points ref={stars} geometry={starGeom}>
 				<pointsMaterial
 					color="#cbd5e1"
@@ -225,7 +241,7 @@ const OrbitScene = () => {
 					emissiveMap={nightMap}
 					emissiveIntensity={2.2}
 					onBeforeCompile={(shader) => {
-						shader.uniforms.uSunDirection = { value: SUN_DIR };
+						shader.uniforms.uSunDirection = sunUniform.current;
 						shader.fragmentShader = shader.fragmentShader
 							.replace(
 								"#include <common>",
