@@ -193,12 +193,13 @@ const OrbitScene = () => {
 		const sa = t * SUN_SPEED;
 		sunUniform.current.value.set(Math.cos(sa), SUN_TILT, Math.sin(sa)).normalize();
 		if (sun.current) sun.current.position.copy(sunUniform.current.value).multiplyScalar(20);
-		// Visible sun rides its own arc across the sky at constant depth (so its
-		// apparent size stays steady) and is depth-tested behind the Earth. It
-		// RISES on one side, crosses high at "midday" (sa=0), and SETS below the
-		// horizon through "night" (sa≈PI) — phase-linked to the moving key light.
+		// Visible sun rides a wide arc across the sky at constant depth (steady
+		// apparent size), depth-tested behind the Earth. It sweeps in from one
+		// edge, crosses high at "midday" (sa=0), and exits the far edge — off
+		// screen for most of the cycle, like the satellite. Phase-linked to the
+		// moving key light.
 		if (sunViz.current)
-			sunViz.current.position.set(Math.sin(sa) * 7, -2.5 + Math.cos(sa) * 7, -1);
+			sunViz.current.position.set(Math.sin(sa) * 9, -0.8 + Math.cos(sa) * 5, -1);
 		const launching = t < LAUNCH_DUR;
 
 		// rocket: fly the Bézier during launch, then shrink out over the transition
