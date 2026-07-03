@@ -8,7 +8,7 @@ const Home = () => {
 			<div className="w-full max-w-6xl mx-auto px-8 md:px-16 flex justify-end">
 				<div className="max-w-xl">
 					<p className="text-sm uppercase tracking-[0.3em] text-blue-300/80 mb-5">
-						Frontend Engineer <span className="text-violet-400" aria-hidden="true">×</span> AI
+						Fullstack Engineer <span className="text-violet-400" aria-hidden="true">×</span> AI
 					</p>
 					<h1 className="text-5xl md:text-7xl font-bold leading-tight drop-shadow-[0_2px_24px_rgba(74,168,255,0.35)]">
 						Yash{" "}
