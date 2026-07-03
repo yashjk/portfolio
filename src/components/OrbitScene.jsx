@@ -1,0 +1,251 @@
+import { useRef, useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+import RocketModel from "./RocketModel";
+import SatelliteModel from "./SatelliteModel";
+
+// Giant Earth anchored far in the bottom-left; only a large curved limb shows.
+// A rocket launches (curving outward so it never enters Earth), transforms
+// into a satellite that orbits along the visible limb, passing behind Earth
+// and reappearing from the front.
+
+const EARTH_C = new THREE.Vector3(-17, -18, 0);
+const EARTH_R = 21;
+const LAUNCH_DUR = 9; // seconds of (slow) rocket flight
+const TRANS = 0.7; // rocket→satellite crossfade half-window
+const ORBIT_R = 26;
+const SLOW_SPEED = 0.1; // rad/s while the satellite is on-screen (lingers)
+const FAST_SPEED = 0.9; // rad/s while it's hidden on the far side (returns sooner)
+const VIS_HALF = 1.1; // half-width (rad) of the visible arc around the limb
+const SMOKE = 60;
+const _up = new THREE.Vector3(0, 1, 0);
+
+const OrbitScene = () => {
+	const earth = useRef();
+	const rocket = useRef();
+	const satellite = useRef();
+	const flame = useRef();
+	const stars = useRef();
+	const puffRefs = useRef([]);
+	const puffState = useRef(
+		Array.from({ length: SMOKE }, () => ({ life: 0, pos: new THREE.Vector3() }))
+	);
+	const spawnTimer = useRef(0);
+	const head = useRef(0);
+	const orbAngle = useRef(0);
+
+	const earthTexture = useMemo(() => {
+		const w = 1024;
+		const h = 512;
+		const c = document.createElement("canvas");
+		c.width = w;
+		c.height = h;
+		const ctx = c.getContext("2d");
+		const grad = ctx.createLinearGradient(0, 0, 0, h);
+		grad.addColorStop(0, "#1e3a8a");
+		grad.addColorStop(0.5, "#2563eb");
+		grad.addColorStop(1, "#1e3a8a");
+		ctx.fillStyle = grad;
+		ctx.fillRect(0, 0, w, h);
+		for (let i = 0; i < 46; i++) {
+			ctx.fillStyle = Math.random() > 0.5 ? "#15803d" : "#166534";
+			const x = Math.random() * w;
+			const y = 40 + Math.random() * (h - 80);
+			const r = 18 + Math.random() * 70;
+			ctx.beginPath();
+			ctx.ellipse(x, y, r, r * (0.5 + Math.random() * 0.4), Math.random() * Math.PI, 0, Math.PI * 2);
+			ctx.fill();
+		}
+		ctx.fillStyle = "#eef2f7";
+		ctx.fillRect(0, 0, w, 22);
+		ctx.fillRect(0, h - 22, w, 22);
+		const tex = new THREE.CanvasTexture(c);
+		tex.colorSpace = THREE.SRGBColorSpace;
+		return tex;
+	}, []);
+
+	const starGeom = useMemo(() => {
+		const pos = [];
+		for (let i = 0; i < 700; i++) {
+			pos.push((Math.random() - 0.5) * 60, (Math.random() - 0.5) * 40, (Math.random() - 0.5) * 34 - 6);
+		}
+		const g = new THREE.BufferGeometry();
+		g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+		return g;
+	}, []);
+
+	// Round sprite for the stars — pointsMaterial draws square points by
+	// default, so we map a soft radial-gradient disc onto each point.
+	const starSprite = useMemo(() => {
+		const s = 64;
+		const c = document.createElement("canvas");
+		c.width = c.height = s;
+		const ctx = c.getContext("2d");
+		const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+		g.addColorStop(0, "rgba(255,255,255,1)");
+		g.addColorStop(0.35, "rgba(255,255,255,0.85)");
+		g.addColorStop(1, "rgba(255,255,255,0)");
+		ctx.fillStyle = g;
+		ctx.beginPath();
+		ctx.arc(s / 2, s / 2, s / 2, 0, Math.PI * 2);
+		ctx.fill();
+		return new THREE.CanvasTexture(c);
+	}, []);
+
+	// direction from Earth centre toward the visible limb (screen centre)
+	const limbDir = useMemo(() => EARTH_C.clone().negate().normalize(), []);
+	// orbit basis: a=0 sits on the visible limb, orbV arcs up + toward camera
+	const orbV = useMemo(() => new THREE.Vector3(0.6, 0.4, 0.9).normalize(), []);
+
+	// launch: from the visible surface, curving outward (Bézier) to orbit entry
+	const p0 = useMemo(() => {
+		const d = EARTH_C.clone().negate();
+		d.z = EARTH_R * 0.3;
+		d.normalize();
+		return EARTH_C.clone().add(d.multiplyScalar(EARTH_R));
+	}, []);
+	const p1 = useMemo(() => EARTH_C.clone().add(limbDir.clone().multiplyScalar(ORBIT_R)), [limbDir]);
+	const pc = useMemo(() => {
+		const r0 = p0.clone().sub(EARTH_C).normalize();
+		return EARTH_C.clone().add(r0.multiplyScalar(EARTH_R + 12));
+	}, [p0]);
+
+	useFrame((state, delta) => {
+		const t = state.clock.getElapsedTime();
+		if (earth.current) earth.current.rotation.y += delta * 0.06;
+		if (stars.current) stars.current.rotation.y -= delta * 0.005;
+		const launching = t < LAUNCH_DUR;
+
+		// rocket: fly the Bézier during launch, then shrink out over the transition
+		if (rocket.current) {
+			const flying = t < LAUNCH_DUR + TRANS;
+			rocket.current.visible = flying;
+			if (flying) {
+				const k = THREE.MathUtils.smoothstep(Math.min(t, LAUNCH_DUR) / LAUNCH_DUR, 0, 1);
+				const omk = 1 - k;
+				rocket.current.position.set(
+					omk * omk * p0.x + 2 * omk * k * pc.x + k * k * p1.x,
+					omk * omk * p0.y + 2 * omk * k * pc.y + k * k * p1.y,
+					omk * omk * p0.z + 2 * omk * k * pc.z + k * k * p1.z
+				);
+				const tan = pc
+					.clone()
+					.sub(p0)
+					.multiplyScalar(2 * omk)
+					.add(p1.clone().sub(pc).multiplyScalar(2 * k))
+					.normalize();
+				rocket.current.quaternion.copy(new THREE.Quaternion().setFromUnitVectors(_up, tan));
+				rocket.current.scale.setScalar(
+					1 - THREE.MathUtils.smoothstep(t, LAUNCH_DUR - TRANS, LAUNCH_DUR + TRANS)
+				);
+			}
+		}
+		if (flame.current) flame.current.scale.setY(0.6 + Math.abs(Math.sin(t * 30)) * 0.6);
+
+		// smoke trail
+		if (launching && rocket.current) {
+			spawnTimer.current += delta;
+			if (spawnTimer.current > 0.05) {
+				spawnTimer.current = 0;
+				const p = puffState.current[head.current % SMOKE];
+				p.pos.copy(rocket.current.position);
+				p.life = 1;
+				head.current++;
+			}
+		}
+		puffState.current.forEach((p, i) => {
+			if (p.life > 0) p.life = Math.max(0, p.life - delta * 0.3);
+			const m = puffRefs.current[i];
+			if (!m) return;
+			m.visible = p.life > 0;
+			m.position.copy(p.pos);
+			m.scale.setScalar((1 - p.life) * 0.55 + 0.16);
+			if (m.material) m.material.opacity = p.life * 0.5;
+		});
+
+		// satellite: grow in over the transition, then orbit the visible limb
+		if (satellite.current) {
+			const appeared = t > LAUNCH_DUR - TRANS;
+			satellite.current.visible = appeared;
+			if (appeared) {
+				// slow while near the visible limb (|angle| small), fast while hidden
+				let an = orbAngle.current % (Math.PI * 2);
+				if (an > Math.PI) an -= Math.PI * 2;
+				if (an < -Math.PI) an += Math.PI * 2;
+				const inView = Math.abs(an) < VIS_HALF;
+				orbAngle.current -= (inView ? SLOW_SPEED : FAST_SPEED) * delta; // reversed
+				const a = orbAngle.current;
+				satellite.current.position.set(
+					EARTH_C.x + ORBIT_R * (Math.cos(a) * limbDir.x + Math.sin(a) * orbV.x),
+					EARTH_C.y + ORBIT_R * (Math.cos(a) * limbDir.y + Math.sin(a) * orbV.y),
+					EARTH_C.z + ORBIT_R * (Math.cos(a) * limbDir.z + Math.sin(a) * orbV.z)
+				);
+				satellite.current.scale.setScalar(
+					THREE.MathUtils.smoothstep(t, LAUNCH_DUR - TRANS, LAUNCH_DUR + TRANS)
+				);
+				satellite.current.rotation.y += delta * 0.5;
+			}
+		}
+	});
+
+	return (
+		<>
+			<points ref={stars} geometry={starGeom}>
+				<pointsMaterial
+					color="#cbd5e1"
+					size={0.14}
+					map={starSprite}
+					alphaTest={0.02}
+					sizeAttenuation
+					transparent
+					opacity={0.8}
+					blending={THREE.AdditiveBlending}
+					depthWrite={false}
+				/>
+			</points>
+
+			{/* atmosphere */}
+			<mesh position={EARTH_C}>
+				<sphereGeometry args={[EARTH_R + 0.6, 64, 64]} />
+				<meshBasicMaterial
+					color="#4aa8ff"
+					transparent
+					opacity={0.16}
+					side={THREE.BackSide}
+					blending={THREE.AdditiveBlending}
+					depthWrite={false}
+				/>
+			</mesh>
+
+			{/* earth */}
+			<mesh ref={earth} position={EARTH_C}>
+				<sphereGeometry args={[EARTH_R, 96, 96]} />
+				<meshStandardMaterial map={earthTexture} roughness={0.9} metalness={0.05} />
+			</mesh>
+
+			{/* smoke pool */}
+			{Array.from({ length: SMOKE }).map((_, i) => (
+				<mesh key={i} ref={(el) => (puffRefs.current[i] = el)} visible={false}>
+					<sphereGeometry args={[0.2, 8, 8]} />
+					<meshBasicMaterial color="#e2e8f0" transparent opacity={0} depthWrite={false} />
+				</mesh>
+			))}
+
+			{/* rocket + flame */}
+			<group ref={rocket}>
+				<RocketModel scale={0.42} />
+				<mesh ref={flame} position={[0, -0.55, 0]} rotation={[Math.PI, 0, 0]}>
+					<coneGeometry args={[0.12, 0.55, 14]} />
+					<meshBasicMaterial color="#fb923c" transparent opacity={0.9} />
+				</mesh>
+			</group>
+
+			{/* satellite */}
+			<group ref={satellite} visible={false}>
+				<SatelliteModel scale={0.5} />
+			</group>
+		</>
+	);
+};
+
+export default OrbitScene;
