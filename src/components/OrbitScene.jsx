@@ -28,6 +28,7 @@ const _up = new THREE.Vector3(0, 1, 0);
 const SUN_DIR = new THREE.Vector3(-2, 4, 7).normalize();
 const SUN_SPEED = 0.12; // rad/s — sun orbits the globe (~52s day/night cycle)
 const SUN_DIST = 60; // distant sun — sweeps by direction, occluded behind the Earth
+const TWO_PI = Math.PI * 2;
 
 // Atmosphere glow: cool blue on the day limb, a warm sunrise band at the
 // terminator, fading to nothing on the night side. Reads the moving sun.
@@ -210,6 +211,19 @@ const OrbitScene = () => {
 			sunUniform.current.value.copy(sunViz.current.position).sub(EARTH_C).normalize();
 			if (sun.current)
 				sun.current.position.copy(sunUniform.current.value).multiplyScalar(20);
+
+			// Fade the disc: visible only as it emerges from behind the Earth
+			// (left) and crosses to the right, then fully out at the right edge —
+			// stays hidden through the whole return so it never reappears from the
+			// right. (The light keeps moving regardless — only the disc fades.)
+			const p = sa % TWO_PI;
+			let op;
+			if (p < 1.0) op = 1; // full opacity for the whole on-screen crossing
+			else if (p < 1.45) op = 1 - (p - 1.0) / 0.45; // fade out AFTER the right edge
+			else if (p < 5.0) op = 0; // hidden through the return
+			else if (p < 5.5) op = (p - 5.0) / 0.5; // fade in as it emerges on the left
+			else op = 1;
+			sunViz.current.material.opacity = op;
 		}
 		const launching = t < LAUNCH_DUR;
 
