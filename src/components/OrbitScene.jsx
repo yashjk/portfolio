@@ -28,11 +28,44 @@ const _up = new THREE.Vector3(0, 1, 0);
 const SUN_DIR = new THREE.Vector3(-2, 4, 7).normalize();
 const SUN_SPEED = 0.12; // rad/s — sun orbits the globe (~52s day/night cycle)
 const SUN_TILT = 0.32; // keeps the sun a little "north" of edge-on
+const SUN_VIZ_DIST = 9; // distance of the visible sun disc along the sun direction
+
+// Atmosphere glow: cool blue on the day limb, a warm sunrise band at the
+// terminator, fading to nothing on the night side. Reads the moving sun.
+const ATMO_VERT = /* glsl */ `
+	varying vec3 vNormalW;
+	varying vec3 vPositionW;
+	void main() {
+		vNormalW = normalize(mat3(modelMatrix) * normal);
+		vec4 wp = modelMatrix * vec4(position, 1.0);
+		vPositionW = wp.xyz;
+		gl_Position = projectionMatrix * viewMatrix * wp;
+	}
+`;
+const ATMO_FRAG = /* glsl */ `
+	uniform vec3 uSunDirection;
+	varying vec3 vNormalW;
+	varying vec3 vPositionW;
+	void main() {
+		vec3 N = normalize(vNormalW);
+		vec3 V = normalize(cameraPosition - vPositionW);
+		float fres = pow(1.0 - max(dot(V, N), 0.0), 2.5); // rim falloff
+		float sunDot = dot(N, uSunDirection);
+		float day = smoothstep(-0.05, 0.45, sunDot);
+		float twilight = exp(-pow(sunDot / 0.22, 2.0)); // warm band at the terminator
+		vec3 dayCol = vec3(0.30, 0.62, 1.0);
+		vec3 duskCol = vec3(1.0, 0.45, 0.22);
+		vec3 col = dayCol * day + duskCol * twilight;
+		float alpha = fres * (day * 0.55 + twilight * 1.15);
+		gl_FragColor = vec4(col, alpha);
+	}
+`;
 
 const OrbitScene = () => {
 	const earth = useRef();
 	const clouds = useRef();
 	const sun = useRef(); // the moving directional light
+	const sunViz = useRef(); // the visible sun disc
 	const rocket = useRef();
 	const satellite = useRef();
 	const flame = useRef();
@@ -64,6 +97,22 @@ const OrbitScene = () => {
 		clouds.anisotropy = 8;
 		return [day, spec, night, clouds];
 	}, []);
+
+	// Atmosphere material — shares the moving sun-direction uniform so the
+	// sunrise band tracks the terminator.
+	const atmoMaterial = useMemo(
+		() =>
+			new THREE.ShaderMaterial({
+				transparent: true,
+				depthWrite: false,
+				blending: THREE.AdditiveBlending,
+				side: THREE.FrontSide,
+				uniforms: { uSunDirection: sunUniform.current },
+				vertexShader: ATMO_VERT,
+				fragmentShader: ATMO_FRAG,
+			}),
+		[]
+	);
 
 	const starGeom = useMemo(() => {
 		const pos = [];
@@ -123,6 +172,8 @@ const OrbitScene = () => {
 		const sa = t * SUN_SPEED;
 		sunUniform.current.value.set(Math.cos(sa), SUN_TILT, Math.sin(sa)).normalize();
 		if (sun.current) sun.current.position.copy(sunUniform.current.value).multiplyScalar(20);
+		if (sunViz.current)
+			sunViz.current.position.copy(sunUniform.current.value).multiplyScalar(SUN_VIZ_DIST);
 		const launching = t < LAUNCH_DUR;
 
 		// rocket: fly the Bézier during launch, then shrink out over the transition
@@ -200,7 +251,26 @@ const OrbitScene = () => {
 	return (
 		<>
 			{/* moving sun (animated in useFrame so the terminator sweeps) */}
-			<directionalLight ref={sun} intensity={3.2} />
+			<directionalLight ref={sun} intensity={2.4} />
+
+			{/* the visible sun disc — a bright core with an additive glow */}
+			<group ref={sunViz}>
+				<mesh>
+					<sphereGeometry args={[0.9, 32, 32]} />
+					<meshBasicMaterial color="#fff2cc" toneMapped={false} />
+				</mesh>
+				<mesh>
+					<sphereGeometry args={[2.1, 32, 32]} />
+					<meshBasicMaterial
+						color="#ffce7a"
+						transparent
+						opacity={0.4}
+						blending={THREE.AdditiveBlending}
+						depthWrite={false}
+						toneMapped={false}
+					/>
+				</mesh>
+			</group>
 
 			<points ref={stars} geometry={starGeom}>
 				<pointsMaterial
@@ -216,17 +286,9 @@ const OrbitScene = () => {
 				/>
 			</points>
 
-			{/* atmosphere */}
-			<mesh position={EARTH_C}>
-				<sphereGeometry args={[EARTH_R + 0.6, 64, 64]} />
-				<meshBasicMaterial
-					color="#4aa8ff"
-					transparent
-					opacity={0.16}
-					side={THREE.BackSide}
-					blending={THREE.AdditiveBlending}
-					depthWrite={false}
-				/>
+			{/* atmosphere — day-blue limb + warm sunrise band at the terminator */}
+			<mesh position={EARTH_C} material={atmoMaterial}>
+				<sphereGeometry args={[EARTH_R + 0.5, 96, 96]} />
 			</mesh>
 
 			{/* earth */}
@@ -235,8 +297,8 @@ const OrbitScene = () => {
 				<meshStandardMaterial
 					map={earthMap}
 					metalnessMap={earthSpec}
-					metalness={0.2}
-					roughness={0.6}
+					metalness={0.6}
+					roughness={0.78}
 					emissive="#ffffff"
 					emissiveMap={nightMap}
 					emissiveIntensity={2.2}
