@@ -27,7 +27,7 @@ const _up = new THREE.Vector3(0, 1, 0);
 // the dark hemisphere. Must match the <directionalLight> position in App.
 const SUN_DIR = new THREE.Vector3(-2, 4, 7).normalize();
 const SUN_SPEED = 0.12; // rad/s — sun orbits the globe (~52s day/night cycle)
-const SUN_TILT = 0.32; // keeps the sun a little "north" of edge-on
+const SUN_DIST = 60; // distant sun — sweeps by direction, occluded behind the Earth
 
 // Atmosphere glow: cool blue on the day limb, a warm sunrise band at the
 // terminator, fading to nothing on the night side. Reads the moving sun.
@@ -191,15 +191,26 @@ const OrbitScene = () => {
 		// cycling day -> dusk -> night -> dawn. The shader mask reads the same
 		// uniform, so the city lights follow the moving night side.
 		const sa = t * SUN_SPEED;
-		sunUniform.current.value.set(Math.cos(sa), SUN_TILT, Math.sin(sa)).normalize();
-		if (sun.current) sun.current.position.copy(sunUniform.current.value).multiplyScalar(20);
-		// Visible sun rides a wide arc across the sky at constant depth (steady
-		// apparent size), depth-tested behind the Earth. It sweeps in from one
-		// edge, crosses high at "midday" (sa=0), and exits the far edge — off
-		// screen for most of the cycle, like the satellite. Phase-linked to the
-		// moving key light.
-		if (sunViz.current)
-			sunViz.current.position.set(Math.sin(sa) * 9, -0.8 + Math.cos(sa) * 5, -1);
+		// Sun travels one very large ellipse (its "daily" path). We only see a
+		// small arc: it emerges from BEHIND the Earth (negative Z, occluded),
+		// sweeps left -> right across the sky, and exits the right edge; the rest
+		// of the ellipse loops off screen until it emerges again. The KEY LIGHT
+		// direction is derived from the sun's actual position (Earth -> sun), so
+		// the day/night terminator and sunrise glow stay in sync with it.
+		if (sunViz.current) {
+			// Distant sun swept by DIRECTION: rises from behind the Earth's left
+			// limb, arcs left -> right across the sky, exits right, then dips below
+			// the horizon and loops behind the Earth (depth-occluded) until it
+			// rises again — one consistent direction, like a real day.
+			const dx = Math.sin(sa) * 0.9; // sweep left -> right
+			const dy = Math.cos(sa) * 0.5 - 0.05; // high as it crosses, dips below to set
+			const dz = -0.82; // aim into the visible sky
+			const s = SUN_DIST / Math.hypot(dx, dy, dz);
+			sunViz.current.position.set(dx * s, dy * s, dz * s);
+			sunUniform.current.value.copy(sunViz.current.position).sub(EARTH_C).normalize();
+			if (sun.current)
+				sun.current.position.copy(sunUniform.current.value).multiplyScalar(20);
+		}
 		const launching = t < LAUNCH_DUR;
 
 		// rocket: fly the Bézier during launch, then shrink out over the transition
@@ -280,7 +291,7 @@ const OrbitScene = () => {
 			<directionalLight ref={sun} intensity={2.4} />
 
 			{/* the visible sun — a soft radial sprite that fades outward */}
-			<sprite ref={sunViz} scale={[2.6, 2.6, 1]}>
+			<sprite ref={sunViz} scale={[13, 13, 1]}>
 				<spriteMaterial
 					map={sunSprite}
 					transparent
