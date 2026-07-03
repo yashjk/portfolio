@@ -3,6 +3,8 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import RocketModel from "./RocketModel";
 import SatelliteModel from "./SatelliteModel";
+import earthDayUrl from "../assets/textures/earth-day.jpg";
+import earthSpecUrl from "../assets/textures/earth-specular.jpg";
 
 // Giant Earth anchored far in the bottom-left; only a large curved limb shows.
 // A rocket launches (curving outward so it never enters Earth), transforms
@@ -34,34 +36,15 @@ const OrbitScene = () => {
 	const head = useRef(0);
 	const orbAngle = useRef(0);
 
-	const earthTexture = useMemo(() => {
-		const w = 1024;
-		const h = 512;
-		const c = document.createElement("canvas");
-		c.width = w;
-		c.height = h;
-		const ctx = c.getContext("2d");
-		const grad = ctx.createLinearGradient(0, 0, 0, h);
-		grad.addColorStop(0, "#1e3a8a");
-		grad.addColorStop(0.5, "#2563eb");
-		grad.addColorStop(1, "#1e3a8a");
-		ctx.fillStyle = grad;
-		ctx.fillRect(0, 0, w, h);
-		for (let i = 0; i < 46; i++) {
-			ctx.fillStyle = Math.random() > 0.5 ? "#15803d" : "#166534";
-			const x = Math.random() * w;
-			const y = 40 + Math.random() * (h - 80);
-			const r = 18 + Math.random() * 70;
-			ctx.beginPath();
-			ctx.ellipse(x, y, r, r * (0.5 + Math.random() * 0.4), Math.random() * Math.PI, 0, Math.PI * 2);
-			ctx.fill();
-		}
-		ctx.fillStyle = "#eef2f7";
-		ctx.fillRect(0, 0, w, 22);
-		ctx.fillRect(0, h - 22, w, 22);
-		const tex = new THREE.CanvasTexture(c);
-		tex.colorSpace = THREE.SRGBColorSpace;
-		return tex;
+	// Real NASA Blue Marble day map + ocean specular map. Loaded imperatively
+	// (no Suspense needed) — the material updates once the images arrive.
+	const [earthMap, earthSpec] = useMemo(() => {
+		const loader = new THREE.TextureLoader();
+		const day = loader.load(earthDayUrl);
+		day.colorSpace = THREE.SRGBColorSpace;
+		day.anisotropy = 8;
+		const spec = loader.load(earthSpecUrl); // data map — keep linear
+		return [day, spec];
 	}, []);
 
 	const starGeom = useMemo(() => {
@@ -220,7 +203,15 @@ const OrbitScene = () => {
 			{/* earth */}
 			<mesh ref={earth} position={EARTH_C}>
 				<sphereGeometry args={[EARTH_R, 96, 96]} />
-				<meshStandardMaterial map={earthTexture} roughness={0.9} metalness={0.05} />
+				<meshStandardMaterial
+					map={earthMap}
+					metalnessMap={earthSpec}
+					metalness={0.2}
+					roughness={0.6}
+					emissive="#ffffff"
+					emissiveMap={earthMap}
+					emissiveIntensity={0.22}
+				/>
 			</mesh>
 
 			{/* smoke pool */}
