@@ -1,112 +1,42 @@
-import { React, Suspense, useEffect, useRef, useState } from "react";
-import { Canvas } from "@react-three/fiber";
-import Loader from "../components/Loader";
-import Island from "../models/Island";
-import Sky from "../models/Sky";
-import Bird from "../models/Bird";
-import Plane from "../models/Plane";
-import HomeInfo from "../components/HomeInfo";
+import { Link } from "react-router-dom";
 
-import itachi from "../assets/itachi.mp3";
-import { soundoff, soundon } from "../assets/icons";
-
+// Hero content sits on the right; the shared Earth/orbit background shows
+// through on the bottom-left.
 const Home = () => {
-  const audioRef = useRef(new Audio(itachi));
-  audioRef.current.volume = 0.4;
-  audioRef.current.loop = true;
-  const [isRotating, setIsRotating] = useState(false);
-  const [currentStage, setCurrentStage] = useState(1);
-  const [isPlayingMusic, setIsPlayingMusic] = useState(true);
-
-  useEffect(() => {
-    if(isPlayingMusic) {
-      audioRef.current.play();
-    }
-
-    return () => {
-      audioRef.current.pause();
-    }
-  }, [isPlayingMusic])
-
-	const adjustIslandForScreenSize = () => {
-		let screenScale = null;
-		let screenPosition = [0, -6.5, -43];
-		let rotation = [0.1, 4.7, 0];
-
-		if (window.innerWidth < 768) {
-			screenScale = [0.9, 0.9, 0.9];
-		} else {
-			screenScale = [1, 1, 1];
-		}
-
-		return [screenScale, screenPosition, rotation];
-	};
-
-	const adjustPlaneForScreenSize = () => {
-		let screenScale, screenPosition;
-
-		if (window.innerWidth < 768) {
-			screenScale = [1.5, 1.5, 1.5];
-			screenPosition = [o, -1.5, 0];
-		} else {
-			screenScale = [3, 3, 3];
-			screenPosition = [0, -4, -4];
-		}
-
-		return [screenScale, screenPosition];
-	};
-
-	const [islandScale, islandPosition, islandRotation] =
-		adjustIslandForScreenSize();
-
-	const [planeScale, planePosition] = adjustPlaneForScreenSize();
-
 	return (
-		<section className="w-full h-screen relative">
-			<div className="absolute top-28 left-0 right-0 z-10 flex justify-center items-center">
-				{currentStage && <HomeInfo currentStage={currentStage} />}
+		<section className="relative w-full min-h-screen flex items-center">
+			<div className="w-full max-w-6xl mx-auto px-8 md:px-16 flex justify-end">
+				<div className="max-w-xl">
+					<p className="text-sm uppercase tracking-[0.3em] text-blue-300/80 mb-5">
+						Frontend Engineer <span className="text-violet-400" aria-hidden="true">×</span> AI
+					</p>
+					<h1 className="text-5xl md:text-7xl font-bold leading-tight drop-shadow-[0_2px_24px_rgba(74,168,255,0.35)]">
+						Yash{" "}
+						<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">
+							Joshi
+						</span>
+					</h1>
+					<p className="mt-6 text-lg text-slate-300 leading-relaxed">
+						I build performant, accessible interfaces in React, Next.js, and
+						TypeScript — and author AI-evaluation benchmarks that challenge
+						frontier models.
+					</p>
+					<div className="mt-9 flex flex-wrap gap-4">
+						<Link
+							to="/projects"
+							className="rounded-lg bg-blue-500 px-6 py-3 font-semibold text-white transition hover:bg-blue-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050813]"
+						>
+							View Projects
+						</Link>
+						<Link
+							to="/contact"
+							className="rounded-lg border border-white/20 px-6 py-3 font-semibold text-slate-100 backdrop-blur-sm transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+						>
+							Get in touch
+						</Link>
+					</div>
+				</div>
 			</div>
-			<Canvas
-				className={`w-full h-screen bg-transparent ${
-					isRotating ? "cursor-grabbing" : "cursor-grab"
-				}`}
-				camera={{ near: 0.1, far: 1000 }}
-			>
-				<Suspense fallback={<Loader />}>
-					<directionalLight position={[1, 1, 1]} intensity={2} />
-					<ambientLight intensity={0.5} />
-					<hemisphereLight
-						skyColor="#b1e1ff"
-						groundColor="#000000"
-						intensity={1}
-					/>
-					<Bird />
-					<Sky isRotating={isRotating} />
-					<Island
-						position={islandPosition}
-						scale={islandScale}
-						rotation={islandRotation}
-						isRotating={isRotating}
-						setIsRotating={setIsRotating}
-						setCurrentStage={setCurrentStage}
-					/>
-					<Plane
-						isRotating={isRotating}
-						scale={planeScale}
-						position={planePosition}
-						rotation={[0, 20, 0]}
-					/>
-				</Suspense>
-			</Canvas>
-
-      <div className="absolute bottom-2 left-2">
-        <img
-          src={!isPlayingMusic ? soundoff : soundon}
-          alt="sound"
-          className="w-10 h-10 cursor-pointer object-contain"
-          onClick={() => setIsPlayingMusic(!isPlayingMusic)}
-        />
-      </div>
 		</section>
 	);
 };

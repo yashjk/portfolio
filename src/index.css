@@ -21,6 +21,46 @@ body:has(.card[data-color="green"]:hover) {
   background-color: rgb(var(--green-rgb) / 25%);
 }
 
+/* Skip link — first focusable element on the page; visible only on focus. */
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 50;
+  transform: translateY(-150%);
+  transition: transform 0.15s ease;
+  background: #2b77e7;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Visible keyboard-focus fallback for any element without a bespoke ring. */
+:focus-visible {
+  outline: 2px solid #7dd3fc;
+  outline-offset: 2px;
+}
+
+/* Respect the OS "reduce motion" setting: near-instant transitions/animations
+   (the 3D background is separately frozen via frameloop in App). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @layer utilities {
   .max-container {
     @apply max-w-5xl mx-auto sm:p-16 pb-12 !pt-[126px] px-8 min-h-[calc(100vh-80px)];
@@ -39,11 +79,11 @@ body:has(.card[data-color="green"]:hover) {
   }
 
   .input {
-    @apply bg-white border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2.5 font-normal shadow-card;
+    @apply bg-white/5 border border-white/10 text-slate-100 placeholder:text-slate-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2.5 font-normal;
   }
 
   .textarea {
-    @apply block p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-200 focus:ring-blue-500 focus:border-blue-500 mt-2.5 font-normal shadow-card;
+    @apply block p-2.5 w-full text-sm text-slate-100 placeholder:text-slate-500 bg-white/5 rounded-lg border border-white/10 focus:ring-blue-500 focus:border-blue-500 mt-2.5 font-normal;
   }
 
   .btn {
@@ -75,8 +115,17 @@ body:has(.card[data-color="green"]:hover) {
   }
 
   .cta-text {
-    @apply text-black-500 font-extrabold flex-1 text-3xl max-md:text-center;
+    @apply text-slate-100 font-extrabold flex-1 text-3xl max-md:text-center;
   }
+}
+
+/* Timeline dates sit on the animated space background — force a readable,
+   WCAG-AA color with a subtle shadow so contrast holds over bright frames. */
+.vertical-timeline-element-date {
+  color: #e2e8f0 !important;
+  opacity: 0.95 !important;
+  font-weight: 500;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
 }
 
 .glassmorphism {
@@ -149,8 +198,10 @@ body:has(.card[data-color="green"]:hover) {
   width: inherit;
   height: inherit;
   background-color: #ffffff33;
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  /* Lighter blur: 16 of these composite over the live WebGL canvas every
+     frame — blur(20px) was a major GPU/compositor crash risk. */
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   transition: 250ms;
   transform-style: preserve-3d;
   transform-origin: top left;

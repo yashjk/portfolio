@@ -17,7 +17,7 @@ const About = () => {
 				</span>
 			</h1>
 
-			<div className="mt-5 flex flex-col gap-3 text-slate-500">
+			<div className="mt-5 flex flex-col gap-3 text-slate-300">
 				<p>
 					Frontend-focused full-stack engineer based in India with 5+ years across
 					React, Next.js, and TypeScript. I build performant, accessible UIs and
@@ -29,10 +29,10 @@ const About = () => {
 			<div className="py-10 flex flex-col">
 				<h3 className="subhead-text">My Skills</h3>
 
-				<div className="mt-16 flex flex-wrap gap-12">
+				<ul className="mt-16 flex flex-wrap gap-12 list-none p-0" aria-label="Skills">
 					{skills.map((skill) => (
-						<div className="block-container w-20 h-20" key={skill.name}>
-							<div className="btn-back rounded-xl" />
+						<li className="block-container w-20 h-20" key={skill.name}>
+							<div className="btn-back rounded-xl" aria-hidden="true" />
 							<div className="btn-front rounded-xl flex justify-center items-center">
 								<img
 									src={skill.imageUrl}
@@ -40,14 +40,14 @@ const About = () => {
 									className="w-1/2 h-1/2 object-contain"
 								/>
 							</div>
-						</div>
+						</li>
 					))}
-				</div>
+				</ul>
 			</div>
 
 			<div className="py-16">
 				<h3 className="subhead-text">Work Experience.</h3>
-				<div className="mt-5 flex flex-col gap-3 text-slate-500">
+				<div className="mt-5 flex flex-col gap-3 text-slate-300">
 					<p>
 						I've worked with various companies, leveling up my skills and
 						teaming up with smart people. Here's the rundown:
@@ -66,24 +66,29 @@ const About = () => {
 									<div className="flex justify-center items-center w-full h-full">
 										<img
 											src={experience.icon}
-											alt={experience.company_name}
+											alt=""
+											aria-hidden="true"
 											className="w-[60%] h-[60%] object-contain"
 										/>
 									</div>
 								}
 								contentStyle={{
-									borderBottom: "8px",
-									borderStyle: "solid",
-									borderBottomColor: experience.borderColor || experience.iconBg,
+									background: "transparent",
+									color: "#e2e8f0",
 									boxShadow: "none",
+									padding: "0 0 0 8px",
+									// No card surface — keep text legible on the animated
+									// background with a shadow (preserves WCAG contrast).
+									textShadow: "0 1px 6px rgba(0, 0, 0, 0.95)",
 								}}
+								contentArrowStyle={{ borderRight: "7px solid transparent" }}
 							>
 								<div>
-									<h3 className="text-black text-xl font-poppins font-semibold">
+									<h3 className="text-white text-xl font-poppins font-semibold">
 										{experience.title}
 									</h3>
 									<p
-										className="text-black-500 font-medium text-base"
+										className="text-slate-300 font-medium text-base"
 										style={{ margin: 0 }}
 									>
 										{experience.company_name}
@@ -94,7 +99,7 @@ const About = () => {
 									{experience.points.map((point, index) => (
 										<li
 											key={`experience-point-${index}`}
-											className="text-black-500/50 font-normal pl-1 text-sm"
+											className="text-slate-200 font-normal pl-1 text-sm"
 										>
 											{point}
 										</li>
