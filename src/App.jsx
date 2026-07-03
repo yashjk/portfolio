@@ -3,15 +3,12 @@ import { Canvas } from "@react-three/fiber";
 import Navbar from "./components/Navbar";
 import MusicToggle from "./components/MusicToggle";
 import OrbitScene from "./components/OrbitScene";
-import usePrefersReducedMotion from "./hooks/usePrefersReducedMotion";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Projects from "./pages/Projects";
 
 const App = () => {
-	const reducedMotion = usePrefersReducedMotion();
-
 	return (
 		<div className="relative min-h-screen bg-[#050813] text-slate-100">
 			{/* Purely decorative 3D background — hidden from assistive tech, not
@@ -19,7 +16,6 @@ const App = () => {
 			<div className="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
 				<Canvas
 					dpr={[1, 1.5]}
-					frameloop={reducedMotion ? "demand" : "always"}
 					gl={{ powerPreference: "high-performance", antialias: true }}
 					camera={{ position: [0, 0, 10], fov: 50 }}
 					tabIndex={-1}
