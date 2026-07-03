@@ -22,7 +22,8 @@ const App = () => {
 				>
 					<color attach="background" args={["#050813"]} />
 					<ambientLight intensity={0.2} />
-					<directionalLight position={[-2, 4, 7]} intensity={3.2} />
+					{/* the key light lives in OrbitScene — it orbits so the
+					    day/night terminator sweeps across the globe */}
 					<OrbitScene />
 				</Canvas>
 				{/* scrim — darkens toward the right where content sits, for contrast */}
