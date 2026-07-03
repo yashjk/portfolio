@@ -17,7 +17,7 @@ const Lab = () => {
 					Yash Joshi
 				</h1>
 				<p className="mt-4 text-lg md:text-2xl text-blue-200 tracking-wide">
-					Frontend Engineer <span className="text-violet-400">×</span> AI
+					Fullstack Engineer <span className="text-violet-400">×</span> AI
 				</p>
 			</div>
 		</section>
