@@ -28,7 +28,6 @@ const _up = new THREE.Vector3(0, 1, 0);
 const SUN_DIR = new THREE.Vector3(-2, 4, 7).normalize();
 const SUN_SPEED = 0.12; // rad/s — sun orbits the globe (~52s day/night cycle)
 const SUN_TILT = 0.32; // keeps the sun a little "north" of edge-on
-const SUN_VIZ_DIST = 9; // distance of the visible sun disc along the sun direction
 
 // Atmosphere glow: cool blue on the day limb, a warm sunrise band at the
 // terminator, fading to nothing on the night side. Reads the moving sun.
@@ -114,6 +113,28 @@ const OrbitScene = () => {
 		[]
 	);
 
+	// Soft sun sprite — a radial gradient (bright core -> warm halo -> fully
+	// transparent) so it fades outward like the real sun, no hard ring. Same
+	// idea as three.js's lensflare0 glow texture.
+	const sunSprite = useMemo(() => {
+		const s = 256;
+		const c = document.createElement("canvas");
+		c.width = c.height = s;
+		const ctx = c.getContext("2d");
+		const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+		g.addColorStop(0.0, "rgba(255, 252, 242, 1.0)");
+		g.addColorStop(0.12, "rgba(255, 246, 220, 0.95)");
+		g.addColorStop(0.28, "rgba(255, 214, 140, 0.55)");
+		g.addColorStop(0.55, "rgba(255, 186, 96, 0.16)");
+		g.addColorStop(0.8, "rgba(255, 170, 80, 0.04)");
+		g.addColorStop(1.0, "rgba(255, 170, 80, 0.0)");
+		ctx.fillStyle = g;
+		ctx.fillRect(0, 0, s, s);
+		const tex = new THREE.CanvasTexture(c);
+		tex.colorSpace = THREE.SRGBColorSpace;
+		return tex;
+	}, []);
+
 	const starGeom = useMemo(() => {
 		const pos = [];
 		for (let i = 0; i < 700; i++) {
@@ -172,8 +193,11 @@ const OrbitScene = () => {
 		const sa = t * SUN_SPEED;
 		sunUniform.current.value.set(Math.cos(sa), SUN_TILT, Math.sin(sa)).normalize();
 		if (sun.current) sun.current.position.copy(sunUniform.current.value).multiplyScalar(20);
+		// Visible sun rides its own shallow arc across the sky at constant depth
+		// (so its apparent size stays steady): high & centred at "midday" (sa=0),
+		// dipping low behind the Earth at "night" (sa=PI), phase-linked to the light.
 		if (sunViz.current)
-			sunViz.current.position.copy(sunUniform.current.value).multiplyScalar(SUN_VIZ_DIST);
+			sunViz.current.position.set(Math.sin(sa) * 6, 1.0 + Math.cos(sa) * 3, -1);
 		const launching = t < LAUNCH_DUR;
 
 		// rocket: fly the Bézier during launch, then shrink out over the transition
@@ -253,24 +277,16 @@ const OrbitScene = () => {
 			{/* moving sun (animated in useFrame so the terminator sweeps) */}
 			<directionalLight ref={sun} intensity={2.4} />
 
-			{/* the visible sun disc — a bright core with an additive glow */}
-			<group ref={sunViz}>
-				<mesh>
-					<sphereGeometry args={[0.9, 32, 32]} />
-					<meshBasicMaterial color="#fff2cc" toneMapped={false} />
-				</mesh>
-				<mesh>
-					<sphereGeometry args={[2.1, 32, 32]} />
-					<meshBasicMaterial
-						color="#ffce7a"
-						transparent
-						opacity={0.4}
-						blending={THREE.AdditiveBlending}
-						depthWrite={false}
-						toneMapped={false}
-					/>
-				</mesh>
-			</group>
+			{/* the visible sun — a soft radial sprite that fades outward */}
+			<sprite ref={sunViz} scale={[2.6, 2.6, 1]}>
+				<spriteMaterial
+					map={sunSprite}
+					transparent
+					blending={THREE.AdditiveBlending}
+					depthWrite={false}
+					toneMapped={false}
+				/>
+			</sprite>
 
 			<points ref={stars} geometry={starGeom}>
 				<pointsMaterial
