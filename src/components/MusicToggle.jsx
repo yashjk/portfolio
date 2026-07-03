@@ -33,7 +33,7 @@ const MusicToggle = () => {
 			onClick={() => setIsPlaying((p) => !p)}
 			aria-pressed={isPlaying}
 			aria-label={isPlaying ? "Turn background music off" : "Turn background music on"}
-			className="fixed bottom-4 left-4 z-20 rounded-full p-1 transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050813]"
+			className="fixed bottom-4 right-4 z-20 rounded-full p-1 transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050813]"
 		>
 			<img
 				src={isPlaying ? soundon : soundoff}
