@@ -25,7 +25,7 @@ const SMOKE = 60;
 const _up = new THREE.Vector3(0, 1, 0);
 // Direction toward the key light — used to mask the night-lights emissive to
 // the dark hemisphere. Must match the <directionalLight> position in App.
-const SUN_DIR = new THREE.Vector3(-3, 3, 12).normalize();
+const SUN_DIR = new THREE.Vector3(-2, 4, 7).normalize();
 
 const OrbitScene = () => {
 	const earth = useRef();
