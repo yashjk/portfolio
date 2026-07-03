@@ -1,4 +1,3 @@
-import hero from './hero.jpg'
 import meta from './meta.png'
 import shopify from './shopify.png'
 import logo from './logo.svg'
@@ -9,7 +8,6 @@ import theta from './theta.svg'
 import agastya from './agastya.png'
 
 export {
-  hero,
   meta,
   shopify,
   logo,
