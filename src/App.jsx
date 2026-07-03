@@ -1,5 +1,6 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { Canvas } from "@react-three/fiber";
+import { Analytics } from "@vercel/analytics/react";
 import Navbar from "./components/Navbar";
 import MusicToggle from "./components/MusicToggle";
 import OrbitScene from "./components/OrbitScene";
@@ -48,6 +49,9 @@ const App = () => {
 					<MusicToggle />
 				</Router>
 			</div>
+
+			{/* Vercel Web Analytics — privacy-friendly page-view + route tracking */}
+			<Analytics />
 		</div>
 	);
 };
