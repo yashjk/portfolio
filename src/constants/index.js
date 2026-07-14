@@ -182,6 +182,24 @@ export const socialLinks = [
 	},
 ];
 
+// External social profiles rendered in the footer. `icon` matches a key in
+// Footer's inline monochrome SVG set (keeps the footer cohesively muted rather
+// than pulling in the brand-colored .svg assets).
+export const socials = [
+	{ name: "GitHub", icon: "github", link: "https://github.com/yashjk" },
+	{
+		name: "LinkedIn",
+		icon: "linkedin",
+		link: "https://www.linkedin.com/in/yash-joshi-2834491a2/",
+	},
+	{ name: "X", icon: "x", link: "https://x.com/joshiyash1206" },
+	{
+		name: "Instagram",
+		icon: "instagram",
+		link: "https://www.instagram.com/techy_vagabond/",
+	},
+];
+
 export const projects = [
 	{
 		iconUrl: agastya,
