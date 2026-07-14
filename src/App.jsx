@@ -2,6 +2,7 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { Canvas } from "@react-three/fiber";
 import { Analytics } from "@vercel/analytics/react";
 import Navbar from "./components/Navbar";
+import RouteMeta from "./components/RouteMeta";
 import MusicToggle from "./components/MusicToggle";
 import OrbitScene from "./components/OrbitScene";
 import Home from "./pages/Home";
@@ -34,6 +35,7 @@ const App = () => {
 			{/* content layer on top */}
 			<div className="relative z-10">
 				<Router>
+					<RouteMeta />
 					<a href="#main-content" className="skip-link">
 						Skip to content
 					</a>
