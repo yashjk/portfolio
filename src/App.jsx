@@ -3,6 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { Analytics } from "@vercel/analytics/react";
 import Navbar from "./components/Navbar";
 import RouteMeta from "./components/RouteMeta";
+import Footer from "./components/Footer";
 import MusicToggle from "./components/MusicToggle";
 import OrbitScene from "./components/OrbitScene";
 import Home from "./pages/Home";
@@ -48,6 +49,7 @@ const App = () => {
 							<Route path="/contact" element={<Contact />} />
 						</Routes>
 					</main>
+					<Footer />
 					<MusicToggle />
 				</Router>
 			</div>
