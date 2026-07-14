@@ -20,6 +20,11 @@ const META = {
 		description:
 			"Selected projects by Yash Joshi — full-stack web apps, experiments, and things built for the web.",
 	},
+	"/writing": {
+		title: "Writing | Yash Joshi",
+		description:
+			"Articles by Yash Joshi on engineering and the craft of building software — published on Medium.",
+	},
 	"/contact": {
 		title: "Contact | Yash Joshi",
 		description: "Get in touch with Yash Joshi, Software Engineer.",

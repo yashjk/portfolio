@@ -200,6 +200,27 @@ export const socials = [
 	},
 ];
 
+// Posts & articles surfaced on /writing, newest first. `platform` is one of
+// "Medium" | "LinkedIn"; an empty array renders a "coming soon" state.
+export const writings = [
+	{
+		title: "The Motivation Myth: How Discipline Outperforms Inspiration",
+		platform: "Medium",
+		url: "https://medium.com/@injose.joshi/kill-motivation-for-success-the-power-of-discipline-over-inspiration-d06e38fce664",
+		date: "September 2024",
+		description:
+			"Why waiting on motivation stalls progress, and how a consistent routine and disciplined schedule become the reliable foundation for getting things done.",
+	},
+	{
+		title: "Integrating Plaid and Dwolla with a Next.js App",
+		platform: "Medium",
+		url: "https://medium.com/@injose.joshi/integrating-plaid-and-dwolla-with-a-next-js-app-329022a2cd75",
+		date: "July 2024",
+		description:
+			"A practical guide to wiring Plaid and Dwolla into a Next.js app for bank-account linking and fund transfers.",
+	},
+];
+
 export const projects = [
 	{
 		iconUrl: agastya,
