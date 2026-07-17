@@ -48,6 +48,32 @@ body:has(.card[data-color="green"]:hover) {
   outline-offset: 2px;
 }
 
+/* Squircle corners (continuous curvature). `corner-shape` reuses the existing
+   `border-radius` as the corner size, so every rounded rectangle keeps its
+   radius and just gets a smoother superellipse curve. superellipse(1.5) is a
+   softened squircle — noticeably curvier than the default squircle (2) while
+   still avoiding the abrupt curvature of a plain circular arc. Chromium-only
+   today — other browsers ignore it and fall back to normal rounded corners.
+   `:where()` keeps specificity at 0 so nothing here overrides component styles.
+   Circles are intentionally excluded (rounded-full) so they stay perfectly
+   round; the vertical-timeline icon circles are likewise untouched. */
+@supports (corner-shape: superellipse(1.5)) {
+  :where(
+    [class*="rounded"]:not([class*="rounded-full"]),
+    .input,
+    .textarea,
+    .btn,
+    .neo-btn,
+    .skip-link,
+    .logo,
+    .glassmorphism,
+    .neo-brutalism-blue,
+    .neo-brutalism-white
+  ) {
+    corner-shape: superellipse(1.5);
+  }
+}
+
 /* Respect the OS "reduce motion" setting: near-instant transitions/animations
    (the 3D background is separately frozen via frameloop in App). */
 @media (prefers-reduced-motion: reduce) {
