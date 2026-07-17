@@ -204,6 +204,14 @@ export const socials = [
 // "Medium" | "LinkedIn"; an empty array renders a "coming soon" state.
 export const writings = [
 	{
+		title: "The Benchmark Failed Before the Model Did",
+		platform: "Medium",
+		url: "https://medium.com/@injose.joshi/the-benchmark-failed-before-the-model-did-b0c5b9ec6eff",
+		date: "July 2026",
+		description:
+			"Building LLM coding benchmarks and finding the infrastructure broke first — state contamination, prompt leakage, and ill-posed problems that failed before the model ever did.",
+	},
+	{
 		title: "The Motivation Myth: How Discipline Outperforms Inspiration",
 		platform: "Medium",
 		url: "https://medium.com/@injose.joshi/kill-motivation-for-success-the-power-of-discipline-over-inspiration-d06e38fce664",
