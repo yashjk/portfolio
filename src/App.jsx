@@ -1,11 +1,10 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import { Canvas } from "@react-three/fiber";
 import { Analytics } from "@vercel/analytics/react";
 import Navbar from "./components/Navbar";
 import RouteMeta from "./components/RouteMeta";
 import Footer from "./components/Footer";
 import MusicToggle from "./components/MusicToggle";
-import OrbitScene from "./components/OrbitScene";
+import Backdrop from "./components/Backdrop";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -15,24 +14,7 @@ import Writing from "./pages/Writing";
 const App = () => {
 	return (
 		<div className="relative min-h-screen bg-[#050813] text-slate-100">
-			{/* Purely decorative 3D background — hidden from assistive tech, not
-			    focusable, and frozen when the user prefers reduced motion. */}
-			<div className="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
-				<Canvas
-					dpr={[1, 1.5]}
-					gl={{ powerPreference: "high-performance", antialias: true }}
-					camera={{ position: [0, 0, 10], fov: 50 }}
-					tabIndex={-1}
-				>
-					<color attach="background" args={["#050813"]} />
-					<ambientLight intensity={0.2} />
-					{/* the key light lives in OrbitScene — it orbits so the
-					    day/night terminator sweeps across the globe */}
-					<OrbitScene />
-				</Canvas>
-				{/* scrim — darkens toward the right where content sits, for contrast */}
-				<div className="absolute inset-0 bg-gradient-to-br from-transparent via-[#050813]/20 to-[#050813]/80" />
-			</div>
+			<Backdrop />
 
 			{/* content layer on top */}
 			<div className="relative z-10">
