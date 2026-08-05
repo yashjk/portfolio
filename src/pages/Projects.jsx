@@ -65,16 +65,30 @@ const Projects = () => {
 										<span className="sr-only"> code for {project.name} (opens in a new tab)</span>
 									</a>
 								)}
-								<a
-									href={project.live_link}
-									target="_blank"
-									rel="noopener noreferrer"
-									className={linkClass}
-								>
-									Live
-									<span className="sr-only"> demo of {project.name} (opens in a new tab)</span>
-									<img src={arrow} alt="" aria-hidden="true" className="w-3.5 h-3.5 object-contain" />
-								</a>
+								{project.npm && (
+									<a
+										href={project.npm}
+										target="_blank"
+										rel="noopener noreferrer"
+										className={linkClass}
+									>
+										npm
+										<span className="sr-only"> package page for {project.name} (opens in a new tab)</span>
+										<img src={arrow} alt="" aria-hidden="true" className="w-3.5 h-3.5 object-contain" />
+									</a>
+								)}
+								{project.live_link && (
+									<a
+										href={project.live_link}
+										target="_blank"
+										rel="noopener noreferrer"
+										className={linkClass}
+									>
+										Live
+										<span className="sr-only"> demo of {project.name} (opens in a new tab)</span>
+										<img src={arrow} alt="" aria-hidden="true" className="w-3.5 h-3.5 object-contain" />
+									</a>
+								)}
 							</div>
 						</article>
 					))}

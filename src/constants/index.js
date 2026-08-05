@@ -1,4 +1,4 @@
-import { meta, shopify, vineti, bba, automint, theta, agastya } from "../assets/images";
+import { meta, shopify, vineti, bba, automint, theta, agastya, devicekeygen } from "../assets/images";
 import {
 	car,
 	contact,
@@ -230,6 +230,16 @@ export const writings = [
 ];
 
 export const projects = [
+	{
+		iconUrl: devicekeygen,
+		theme: "btn-back-black",
+		name: "device-unique-keygen",
+		description:
+			"A zero-dependency browser fingerprinting library, published to npm. Generates a deterministic device ID by combining audio, canvas, WebGL, and baseline browser signals, then hashing them with a compact 53-bit hash — with graceful fallbacks when signals are blocked. Ships ESM/CJS/IIFE builds with TypeScript types.",
+		npm: "https://www.npmjs.com/package/device-unique-keygen",
+		source_code: "https://github.com/yashjk/device-keygen",
+		live_link: "https://device-keygen.yashjoshi.in/",
+	},
 	{
 		iconUrl: agastya,
 		theme: "btn-back-blue",

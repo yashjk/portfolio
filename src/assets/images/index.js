@@ -6,6 +6,7 @@ import bba from './bba.webp'
 import automint from './automint.svg'
 import theta from './theta.svg'
 import agastya from './agastya.png'
+import devicekeygen from './devicekeygen.svg'
 
 export {
   meta,
@@ -16,4 +17,5 @@ export {
   automint,
   theta,
   agastya,
+  devicekeygen,
 }
